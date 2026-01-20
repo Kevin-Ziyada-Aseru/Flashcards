@@ -6,7 +6,7 @@ void main() {
   runApp(const MyApp());
 }
 
-/// **MyApp** - Root configuration
+//Root configuration
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

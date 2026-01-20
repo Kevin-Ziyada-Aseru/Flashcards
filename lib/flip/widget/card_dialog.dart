@@ -1,28 +1,22 @@
-import 'package:flashcards/flip/model/flash_card_model.dart';
 import 'package:flutter/material.dart';
 
 class AddCardDialog extends StatefulWidget {
-  const AddCardDialog({Key? key}) : super(key: key);
+  final Function(String question, String answer) onAdd;
+
+  const AddCardDialog({Key? key, required this.onAdd}) : super(key: key);
 
   @override
   State<AddCardDialog> createState() => _AddCardDialogState();
 }
 
 class _AddCardDialogState extends State<AddCardDialog> {
-  late TextEditingController questionController;
-  late TextEditingController answerController;
-
-  @override
-  void initState() {
-    super.initState();
-    questionController = TextEditingController();
-    answerController = TextEditingController();
-  }
+  final _questionController = TextEditingController();
+  final _answerController = TextEditingController();
 
   @override
   void dispose() {
-    questionController.dispose();
-    answerController.dispose();
+    _questionController.dispose();
+    _answerController.dispose();
     super.dispose();
   }
 
@@ -34,21 +28,13 @@ class _AddCardDialogState extends State<AddCardDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            controller: questionController,
-            decoration: const InputDecoration(
-              labelText: 'Question',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 3,
+            controller: _questionController,
+            decoration: const InputDecoration(labelText: 'Question'),
           ),
           const SizedBox(height: 16),
           TextField(
-            controller: answerController,
-            decoration: const InputDecoration(
-              labelText: 'Answer',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 3,
+            controller: _answerController,
+            decoration: const InputDecoration(labelText: 'Answer'),
           ),
         ],
       ),
@@ -57,17 +43,12 @@ class _AddCardDialogState extends State<AddCardDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        ElevatedButton(
+        TextButton(
           onPressed: () {
-            if (questionController.text.isNotEmpty &&
-                answerController.text.isNotEmpty) {
-              Navigator.pop(
-                context,
-                Flashcard(
-                  question: questionController.text,
-                  answer: answerController.text,
-                ),
-              );
+            if (_questionController.text.isNotEmpty &&
+                _answerController.text.isNotEmpty) {
+              widget.onAdd(_questionController.text, _answerController.text);
+              Navigator.pop(context);
             }
           },
           child: const Text('Add'),

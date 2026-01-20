@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+// MultipleAnsScreen widget definition
 class MultipleAnsScreen extends StatelessWidget {
   const MultipleAnsScreen({super.key});
-
+  // Build method to render the widget
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // AppBar configuration
       appBar: AppBar(
         title: const Text('Multiple Choice'),
         elevation: 0.5,
@@ -13,10 +15,12 @@ class MultipleAnsScreen extends StatelessWidget {
         surfaceTintColor: Colors.white,
         foregroundColor: Colors.black,
       ),
+      // Body content
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Icon container
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
