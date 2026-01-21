@@ -1,6 +1,6 @@
 # Flashcards
 
-A minimalist Flutter app for high-agency learning. Multiple learning modes, track your accuracy, ship offline.
+A  Flutter app for high-agency learning. Multiple learning modes, track your accuracy, ship offline.
 
 
 
@@ -17,8 +17,6 @@ A minimalist Flutter app for high-agency learning. Multiple learning modes, trac
 
 - **Flutter** 3.0+
 - **Dart** 3.0+
-- **State Management:** `setState()` (intentionally simple)
-- **Font:** Inter (custom)
 - **Target Platforms:** iOS, Android, Web
 
 Modular architecture. No packages beyond Flutter itself.
@@ -26,8 +24,9 @@ Modular architecture. No packages beyond Flutter itself.
 ## Run It
 
 ```bash
-git clone https://github.com/yourusername/flashcards.git
+git clone https://github.com/kevin-ziyada-aseru/flashcards.git
 cd flashcards
+cd frontend
 
 flutter pub get
 flutter run
