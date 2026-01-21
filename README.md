@@ -1,16 +1,57 @@
-# flashcards
+# Flashcards
 
-A new Flutter project.
+A minimalist Flutter app for high-agency learning. Multiple learning modes, track your accuracy, ship offline.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Four learning modes: Flip, Match, Multiple Choice, Write & Review
+- Real-time quiz tracking and accuracy scoring
+- Add/delete/clear cards per mode
+- Muted professional design (no gradients, no fluff)
+- Fully offline, zero dependencies
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## Tech
+
+- **Flutter** 3.0+
+- **Dart** 3.0+
+- **State Management:** `setState()` (intentionally simple)
+- **Font:** Inter (custom)
+- **Target Platforms:** iOS, Android, Web
+
+Modular architecture. No packages beyond Flutter itself.
+
+## Run It
+
+```bash
+git clone https://github.com/yourusername/flashcards.git
+cd flashcards
+
+flutter pub get
+flutter run
+```
+
+
+
+## Learning Modes
+
+**Flip & Learn** — Interactive 3D card flip with counter-rotated text, real-time scoring.
+
+**Match Cards** — Drag to match questions with answers, instant validation.
+
+**Multiple Choice** — Quiz mode with four options, accuracy tracking.
+
+**Write & Review** — Answer in your own words, manual grading.
+
+
+## Author
+
+**Kevin Ziyada Aseru**  
+kevin.aseru@emtechhouse.com
+
+
+## License
+
+MIT
