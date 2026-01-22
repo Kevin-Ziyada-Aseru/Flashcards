@@ -20,8 +20,7 @@ We designed every screen, button, and interaction around one principle: **Get yo
 
 **Minimal Design**
 
-- Clean navy and teal colors. No bright distractions.
-- Natural shadows and spacing. Everything feels intentional.
+- Everything feels intentional.
 - Professional typography. Easy on the eyes.
 
 **Fast Workflows**
@@ -55,7 +54,7 @@ Whether you're learning Korean vocabulary or mastering technical documentation, 
 - Authentication endpoints (not integrated yet)
 - Not yet connected to frontend
 
-**Integration**: ⏳ Next Phase
+**Integration**: Next Phase
 
 - Will connect frontend to backend APIs
 - User data persistence
