@@ -4,6 +4,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import flipcardsRoutes from './routes/flipcards.routes.js'
 import cors from 'cors'
+import cards from './routes/cards.routes.js'
 
 
 
@@ -13,6 +14,9 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/flipcards', flipcardsRoutes)
+app.use('/cards', cards)
+
+
 
 
 
