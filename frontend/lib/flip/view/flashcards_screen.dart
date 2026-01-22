@@ -174,7 +174,6 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
 
   @override
   Widget build(BuildContext context) {
-    // ✅ FIX: Check if flashcards is empty BEFORE accessing
     if (flashcards.isEmpty) {
       return Scaffold(
         appBar: AppBar(
@@ -188,9 +187,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
       );
     }
 
-    var card =
-        flashcards[currentIndex]; // ✅ Safe now - we know list is not empty
-
+    var card = flashcards[currentIndex];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flip Cards'),
@@ -216,7 +213,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // ✅ FIX: Don't take infinite height
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Progress Section
@@ -251,11 +248,10 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
 
             // Mark Wrong and Correct buttons
             SizedBox(
-              width: double.infinity, // ✅ FIX: Give Row bounded width
+              width: double.infinity,
               child: Row(
                 children: [
                   Expanded(
-                    // ✅ FIX: Use Expanded for equal width
                     child: BtnIcon(
                       onTap: _markWrong,
                       color: Colors.red[600]!,
@@ -266,7 +262,6 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    // ✅ FIX: Use Expanded for equal width
                     child: BtnIcon(
                       onTap: _markCorrect,
                       color: Colors.green[600]!,
@@ -283,11 +278,10 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
 
             // Add and Delete card buttons
             SizedBox(
-              width: double.infinity, // ✅ FIX: Give Row bounded width
+              width: double.infinity,
               child: Row(
                 children: [
                   Expanded(
-                    // ✅ FIX: Use Expanded for equal width
                     child: BtnWidget(
                       onTap: _addNewCard,
                       label: "+ Add Card",
@@ -297,7 +291,6 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    // ✅ FIX: Use Expanded for equal width
                     child: BtnWidget(
                       onTap: _deleteCurrentCard,
                       label: 'Delete',
@@ -313,7 +306,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
 
             // Clear all cards button
             SizedBox(
-              width: double.infinity, // ✅ FIX: Give it bounded width
+              width: double.infinity,
               child: BtnWidget(
                 onTap: _clearAllCards,
                 label: 'Clear All Cards',

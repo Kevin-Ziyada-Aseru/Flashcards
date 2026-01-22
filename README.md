@@ -2,7 +2,7 @@
 
 A full-stack learning platform built with Flutter and Node.js. Study smarter by removing the setup friction. Go from document to active learning in under 60 seconds.
 
-## Philosophy: User Experience First
+## User Experience First
 
 Most study apps waste your time on setup. You spend 70% of your time typing vocab, definitions, and examples. Only 30% actually learning.
 
