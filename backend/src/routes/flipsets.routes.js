@@ -5,7 +5,7 @@ import { pool } from '../server.js';
 const router = express.Router();
 
 
-
+// Create a new flashset
 router.post('/', async (req, res) => {
     const detail = req.body.detail
     const name = req.body.name
@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
     }
 })
 
-
+// Get all flashsets
 router.get('/', async (req, res) => {
     try {
         const { rows } = await pool.query(
@@ -74,7 +74,7 @@ router.delete('/:id', async (req, res) => {
     }
     
 })
-
+// Update a specific flashset
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { name, detail } = req.body;
@@ -96,7 +96,5 @@ router.put('/:id', async (req, res) => {
     }
     
 });
-
-
 
 export default router
