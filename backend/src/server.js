@@ -16,6 +16,7 @@ app.use('/flipcards', flipcardsRoutes)
 app.use('/cards', cards)
 app.use('/study_sessions', study_sessions)
 
+
 export const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
