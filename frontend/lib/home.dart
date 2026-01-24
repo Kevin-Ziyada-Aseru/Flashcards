@@ -1,3 +1,4 @@
+import 'package:flashcards/auth/provider/auth_provider.dart';
 import 'package:flashcards/flip/view/flipdeck_screen.dart';
 import 'package:flashcards/match/view/matchcards_screen.dart';
 import 'package:flashcards/multiple/view/multiple_ans_screen.dart';
@@ -6,15 +7,16 @@ import 'package:flashcards/widget/placeholder.dart';
 import 'package:flashcards/widget/activities_section.dart';
 import 'package:flashcards/write/view/write_review.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
   // List of learning mode cards
@@ -53,6 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(currentUserProvider);
+    final token = ref.watch(authTokenProvider);
+    final isLoading = ref.watch(authLoadingProvider);
     return Scaffold(
       appBar: _buildAppBar(),
       body: _getPage(),
@@ -62,23 +67,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // App bar with title and subtitle
   PreferredSizeWidget _buildAppBar() {
+    final user = ref.watch(currentUserProvider);
+
     return AppBar(
       elevation: 0.5,
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
-      title: const Column(
+      title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Learn Today',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1F2937),
-              letterSpacing: -0.5,
-            ),
-          ),
-          Text(
+          Text('Hello, ${user?.name}!'),
+          const Text(
             'Pick a learning method',
             style: TextStyle(
               fontSize: 11,

@@ -1,16 +1,51 @@
 class Flashcard {
+  final int id;
   final String question;
   final String answer;
+  final int setId;
+  final DateTime? createdAt;
 
-  Flashcard({required this.question, required this.answer});
+  Flashcard({
+    required this.id,
+    required this.question,
+    required this.answer,
+    required this.setId,
+    this.createdAt,
+  });
 
-  // Convert from Map
-  factory Flashcard.fromMap(Map<String, String> map) {
-    return Flashcard(question: map['q'] ?? '', answer: map['a'] ?? '');
+  factory Flashcard.fromJson(Map<String, dynamic> json) {
+    return Flashcard(
+      id: json['id'],
+      question: json['question'],
+      answer: json['answer'],
+      setId: json['set_id'],
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
+    );
   }
 
-  // Convert to Map
-  Map<String, String> toMap() {
-    return {'q': question, 'a': answer};
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'question': question,
+    'answer': answer,
+    'set_id': setId,
+    if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+  };
+
+  Flashcard copyWith({
+    int? id,
+    String? question,
+    String? answer,
+    int? setId,
+    DateTime? createdAt,
+  }) {
+    return Flashcard(
+      id: id ?? this.id,
+      question: question ?? this.question,
+      answer: answer ?? this.answer,
+      setId: setId ?? this.setId,
+      createdAt: createdAt ?? this.createdAt,
+    );
   }
 }

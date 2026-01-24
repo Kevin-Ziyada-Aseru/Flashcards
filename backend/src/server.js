@@ -6,6 +6,8 @@ import flipcardsRoutes from './routes/flipsets.routes.js'
 import cors from 'cors'
 import cards from './routes/cards.routes.js'
 import study_sessions from './routes/study_sessions.routes.js'
+import auth from './routes/auth.routes.js'
+
 
 
 const app = express()
@@ -15,6 +17,8 @@ app.use(express.json())
 app.use('/flipcards', flipcardsRoutes)
 app.use('/cards', cards)
 app.use('/study_sessions', study_sessions)
+app.use('/auth', auth)
+
 
 export const pool = new Pool({
   user: 'postgres',

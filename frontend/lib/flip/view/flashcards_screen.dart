@@ -1,6 +1,9 @@
-import 'dart:math';
-import 'package:flashcards/flip/model/card_results.dart';
 import 'package:flashcards/flip/model/flashcard_model.dart';
+import 'package:flashcards/flip/providers/flashcard_provider.dart';
+import 'package:flashcards/flip/providers/study_notifier.dart';
+import 'package:flashcards/flip/view/study_session.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flashcards/flip/view/empty_state.dart';
 import 'package:flashcards/flip/view/results_page.dart';
 import 'package:flashcards/flip/widget/card_dialog.dart';
@@ -8,25 +11,22 @@ import 'package:flashcards/flip/widget/flipcard_widget.dart';
 import 'package:flashcards/flip/widget/progress_section.dart';
 import 'package:flashcards/widget/btn_icon.dart';
 import 'package:flashcards/widget/btn_widget.dart';
-import 'package:flutter/material.dart';
 
-class FlashcardsScreen extends StatefulWidget {
-  final List<Map<String, String>>? initialCards;
+class FlashcardsScreen extends ConsumerStatefulWidget {
+  final int setId;
+  final String setName;
 
-  const FlashcardsScreen({Key? key, this.initialCards}) : super(key: key);
+  const FlashcardsScreen({Key? key, required this.setId, required this.setName})
+    : super(key: key);
 
   @override
-  State<FlashcardsScreen> createState() => _FlashcardsScreenState();
+  ConsumerState<FlashcardsScreen> createState() => _FlashcardsScreenState();
 }
 
-class _FlashcardsScreenState extends State<FlashcardsScreen>
+class _FlashcardsScreenState extends ConsumerState<FlashcardsScreen>
     with TickerProviderStateMixin {
-  late List<Flashcard> flashcards;
-  int currentIndex = 0;
-  bool isFlipped = false;
   late AnimationController _flipController;
-  List<CardResult> results = [];
-  bool showingResults = false;
+  bool isFlipped = false;
 
   @override
   void initState() {
@@ -36,19 +36,10 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
       vsync: this,
     );
 
-    flashcards =
-        (widget.initialCards ??
-                [
-                  {'q': 'What is the capital of France?', 'a': 'Paris'},
-                  {'q': 'What is 2 + 2?', 'a': '4'},
-                  {'q': 'What is the largest planet?', 'a': 'Jupiter'},
-                  {
-                    'q': 'Who wrote Romeo and Juliet?',
-                    'a': 'William Shakespeare',
-                  },
-                ])
-            .map((map) => Flashcard.fromMap(map))
-            .toList();
+    // Initialize study session when screen loads
+    Future.microtask(() {
+      ref.read(initializeStudyProvider(widget.setId));
+    });
   }
 
   void _addNewCard() {
@@ -56,24 +47,19 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
       context: context,
       builder: (context) => AddCardDialog(
         onAdd: (question, answer) {
-          setState(() {
-            flashcards.add(Flashcard(question: question, answer: answer));
-          });
+          // Add card to backend
+          ref.read(createCardProvider((widget.setId, question, answer)));
         },
       ),
     );
   }
 
   void _deleteCurrentCard() {
-    if (flashcards.isNotEmpty) {
-      setState(() {
-        flashcards.removeAt(currentIndex);
-        if (currentIndex >= flashcards.length && currentIndex > 0) {
-          currentIndex--;
-        }
-        isFlipped = false;
-        _flipController.reset();
-      });
+    final study = ref.read(studyProvider);
+    final currentCard = study.currentCard;
+
+    if (currentCard != null) {
+      ref.read(deleteCardProvider(currentCard.id));
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Card deleted')));
@@ -95,14 +81,12 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
           ),
           TextButton(
             onPressed: () {
-              setState(() {
-                flashcards.clear();
-                currentIndex = 0;
-                isFlipped = false;
-                _flipController.reset();
-                results.clear();
-                showingResults = false;
-              });
+              final study = ref.read(studyProvider);
+              // Delete all cards
+              for (final card in study.cards) {
+                ref.read(deleteCardProvider(card.id));
+              }
+              ref.read(studyProvider.notifier).reset();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('All cards cleared')),
@@ -116,51 +100,26 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
   }
 
   void _markCorrect() {
-    results.add(CardResult(index: currentIndex, correct: true));
-
-    if (currentIndex < flashcards.length - 1) {
-      setState(() {
-        currentIndex++;
-        isFlipped = false;
-        _flipController.reset();
-      });
-    } else {
-      setState(() {
-        showingResults = true;
-      });
-    }
+    ref.read(studyProvider.notifier).markCorrect();
   }
 
   void _markWrong() {
-    results.add(CardResult(index: currentIndex, correct: false));
-
-    if (currentIndex < flashcards.length - 1) {
-      setState(() {
-        currentIndex++;
-        isFlipped = false;
-        _flipController.reset();
-      });
-    } else {
-      setState(() {
-        showingResults = true;
-      });
-    }
+    ref.read(studyProvider.notifier).markWrong();
   }
 
   void _restartQuiz() {
-    setState(() {
-      currentIndex = 0;
-      isFlipped = false;
-      _flipController.reset();
-      results.clear();
-      showingResults = false;
-    });
+    ref.read(studyProvider.notifier).restart();
   }
 
-  @override
-  void dispose() {
-    _flipController.dispose();
-    super.dispose();
+  void _saveAndExit() async {
+    final study = ref.read(studyProvider);
+    if (study.correctCount + study.wrongCount > 0) {
+      // Save session to backend
+      await ref.read(saveStudySessionProvider(widget.setId).future);
+    }
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   void toggleFlip() {
@@ -173,42 +132,73 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (flashcards.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Flip Cards'),
-          elevation: 0.5,
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
-          foregroundColor: Colors.black,
-        ),
-        body: EmptyState(onAddCard: _addNewCard),
-      );
-    }
+  void dispose() {
+    _flipController.dispose();
+    super.dispose();
+  }
 
-    var card = flashcards[currentIndex];
+  @override
+  Widget build(BuildContext context) {
+    final cardsAsync = ref.watch(cardsBySetProvider(widget.setId));
+    final study = ref.watch(studyProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flip Cards'),
+        title: Text(widget.setName),
         elevation: 0.5,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      body: showingResults
-          ? ResultsPage(
-              correct: results.where((r) => r.correct).length,
-              wrong: results.where((r) => !r.correct).length,
+      body: cardsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => ref.refresh(cardsBySetProvider(widget.setId)),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+        data: (cards) {
+          if (cards.isEmpty) {
+            return EmptyState(onAddCard: _addNewCard);
+          }
+
+          // If study is completed, show results
+          if (study.isCompleted) {
+            return ResultsPage(
+              correct: study.correctCount,
+              wrong: study.wrongCount,
               onTryAgain: _restartQuiz,
-            )
-          : _buildFlipCardView(),
+            );
+          }
+
+          // If no cards loaded in study, initialize them
+          if (study.cards.isEmpty) {
+            Future.microtask(() {
+              ref.read(studyProvider.notifier).loadCards(cards);
+            });
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final currentCard = study.currentCard;
+          if (currentCard == null) {
+            return const Center(child: Text('No card to display'));
+          }
+
+          return _buildFlipCardView(study, currentCard);
+        },
+      ),
     );
   }
 
-  Widget _buildFlipCardView() {
-    var card = flashcards[currentIndex];
-
+  Widget _buildFlipCardView(StudyState study, Flashcard currentCard) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -218,16 +208,16 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
           children: [
             // Progress Section
             ProgressSection(
-              currentIndex: currentIndex,
-              totalCards: flashcards.length,
+              currentIndex: study.currentCardIndex,
+              totalCards: study.cards.length,
             ),
 
             const SizedBox(height: 32),
 
             // Flip card widget
             FlipCardWidget(
-              question: card.question,
-              answer: card.answer,
+              question: currentCard.question,
+              answer: currentCard.answer,
               showAnswer: isFlipped,
               angle: _flipController.value,
               onTap: toggleFlip,
@@ -312,6 +302,23 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                 label: 'Clear All Cards',
                 bgColor: Colors.grey[300]!,
                 textColor: const Color(0xFF374151),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Save and Exit button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _saveAndExit,
+                icon: const Icon(Icons.check),
+                label: const Text('Save & Exit'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1F3A5F),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
               ),
             ),
           ],
